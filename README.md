@@ -1,74 +1,52 @@
-Assignment 3 - Persistence: Two-tier Web Application with Flat File Database, Express server, and CSS template
-===
-
-Due: September 16th, by 11:59 AM.
-
-This assignnment continues where we left off, extending it to use the most popular Node.js server framework (express), a flat file database suitable for small applications (lowdb), and a CSS application framework / template of your choice (Boostrap, Material Design, Semantic UI, Pure etc.)
-
-
-Baseline Requirements
 ---
 
-Your application is required to implement the following functionalities:
+## WPI Track and Field Diet Tracker
 
-- a `Server`, created using Express (no alternatives will be accepted for this assignment)
-- a `Results` functionality which shows the entire dataset residing in the server's memory
-- a `Form/Entry` functionality which allows users to add, modify, and delete data items (must be all three!) associated with their user name / account.
-- Use of at least five [Express middleware packages](https://expressjs.com/en/resources/middleware.html). Explore! 
-- Basic authentication using the [Passport middleware](http://www.passportjs.org) for Express (this counts as one of your five middleware packages). We encourage using the Local strategy, but OAuth (Open Authentication) can also be used for additional technical achievement. The course staff cannot help you with the various flavors of OAuth strategies. YOU MUST PROVIDE US WITH ACCOUNT CREDENTIALS TO LOGIN TO YOUR APPLICATION IF YOU USE OAUTH. The course staff cannot be expected to have credentials for any particular OAuth service.
-- Persistent data storage in between server sessions. [lowdb](https://github.com/typicode/lowdb) is a suitable database package for this assignment and will be discussed in class.
-- Use of a [CSS framework or template](https://github.com/troxler/awesome-css-frameworks). This should do the bulk of your styling/CSS for you and be appropriate to your application. For example, don't use [NES.css](https://nostalgic-css.github.io/NES.css/) (which is awesome!) unless you're creating a game or some type of retro 80s site.
+http://a3-mjadiletta.glitch.me 
 
-Your application is required to demonstrate the use of the following concepts:
+#### Goal
+This is an application designed for the WPI track and field team. My coach asked me to make an easy to use website to add data to track basic food groups. This application accomplishes that and allows users to add data on a 
+daily basis and be stored in a database. 
 
-HTML:
-- HTML input tags and form fields of various flavors (`<textarea>`, `<input>`, checkboxes, radio buttons etc.)
-- HTML that can display all data *for a particular authenticated user*. Note that this is different from the last assignnment, which required the display of all data in memory on the server.
+#### Challenges
+I had quite a few challenges with this assignment. First, I had an incredibly difficult time implementing the express server. I could not figure out how to communicate between the front end and the back end for many hours. 
+Then I struggled for at least 10 hours through user authentication. I finally managed to get url authentication, but later I realized I needed json authentication for POST data and so I redesigned for another 10 hours. 
 
-Note that it might make sense to have two simple pages for this assignment, one that handles login / authentication, and one that contains the rest of your application. For this assignment, it is acceptable to simply create new user accounts upon login if none exist, however, you must alert your users to this fact. If you're not using OAuth 
+#### Authentication Strategy
+I chose the local method because the track team does not have GIT hub accounts, and we were told that GIT hub was the only account we were guaranteed to have from Prof. Roberts. Thus, I went with local because I can give each
+of my teammates an account manually. 
 
-CSS:
-- CSS styling should primarily be provided by your chosen template/framework. Oftentimes a great deal of care has been put into designing CSS templates; don't override their stylesheets unless you are extremely confident in your graphic design capabilities. The idea is to use CSS templates that give you a professional looking design aesthetic without requiring you to be a graphic designer yourself.
+#### Database Strategy
+I chose to use my own database system. I wrote part of the database for last project, but I have since upgraded the system significantly. It is an incredibly detailed database structure that allows for lots of data to be stored
+easily and efficiently. It was also the easiest to implement because I coded it.
 
-JavaScript:
-- At minimum, a small amount of front-end JavaScript to get / fetch data from the server. See the [previous assignment](https://github.com/cs4241-19a/a2-shortstack) for reference.
+#### CSS framework
+I chose to use BULMA because it provides many cool features with flex. I liked bulma over other options because the formating is very clean and rounded - frendly for everyday users. It is also an easy import for html design. 
 
-Node.js:
-- A server using Express, at least five pieces of Express middleware, and a persistent database (a flat file using lowdb is great).
-
-Deliverables
----
-
-Do the following to complete this assignment:
-
-1. Implement your project with the above requirements. A good potential starting point is to use the "hello-express" project template inside of Glitch; this appears as an option when you hit the "New Project" button. Use the work you did in the last assignment as a reference to implement functionality, as well as the notes from class on 9/9 and 9/12.
-2. If you developed your project locally, deploy your project to Glitch, and fill in the appropriate fields in your package.json file.
-3. Test your project to make sure that when someone goes to your main page on Glitch, it displays correctly.
-4. Ensure that your project has the proper naming scheme `a3-yourname` so we can find it.
-5. Fork this repository and modify the README to the specifications below. You do not need to include any of your project files in this repo (we will see those on Glitch), you only need to update and commit the README file.
-6. Create and submit a Pull Request to the original repo. Name the pull request using the following template: `a3-gitname-firstname-lastname`.
-
-Sample Readme (delete the above when you're ready to submit, and modify the below so with your links and descriptions)
----
-
-## Your Web Application Title
-
-your glitch link e.g. http://a3-charlieroberts.glitch.me
-
-Include a very brief summary of your project here. Images are encouraged, along with concise, high-level text. Be sure to include:
-
-- the goal of the application
-- challenges you faced in realizing the application
-- what authentication strategy / database you chose to use and why (choosing one because it seemed the easiest to implement is perfectly acceptable)
-- what CSS framework you used and why.
-  - include any modifications to the CSS framework you made via custom CSS you authored.
-- the five Express middleware packages you used and a short (one sentence) summary of what each one does.
+#### Express Packages
+1. passport : passport is used for user authentication and was required for the project. 
+2. morgan : morgan is a tool that logs html requrests and responses. It uses tokens, req, and res and displays them in the console. 
+3. cookie-parser : this iterates over keys and checks for any signed cookies. If the key is signed, then it is taken from the request, and put in the response. 
+4. feature-policy : this package is a part of the helmet package but I customized it so that I limit the types of attacks that can occur on my website.
+5. referrer-policy : this package is also a part of the helmet package. I customized it by forcing all url requests and responses to be hidden. This increases privacy. 
 
 ## Technical Achievements
-- **Tech Achievement 1**: I used OAuth authentication via the GitHub strategy
-- **Tech Achievement 2**: I used over ten Express middleware packages, enabling me to create a server that...
+- **Enhanced JSON Database with Query Commands**: I created a method for storing and retreiving information for users using a JSON database. I setup the database by reading and writing to a JSON file. The file is only one
+object, all the data residing in the database. I wrote commands that query the database and retreive the required information and returns the information to the user. This is enhanced from the previous project by adding 
+functionality to only take certain objets to reduce the time querying. I also store much more infomation in a well defined user structure. 
+- **Created a method for Exporting data**: I wrote some javascript to export the database. It sends a json file to your laptop to view in other types of json viewers. 
+- **Created a graphing mechanism**: I Canvas.js to create interactive graphs of the data in the database. Unfortunately, there were some issues so I only got it half working, but there is notable technology to 
+consider it an achievement I believe. 
+- **Wrote lots of Java Script for User Interface**: I wrote a lot of javascript that accesses elements by ID, class ect. to have them show and hide at correct times. This allows the user to have a two page website
+that has lots of builtin functionality - login.html to user.html.
+- **Implemented Server logic for handling API endpoint requests**: Whenever a user requests data from the server, the front end sends a request for an API endpoint. Then the server does the correct action based on the 
+requested endpoint. This allows for scalability for future additons to the project.
 
-### Design/Evaluation Achievements
-- **Design Achievement 1**: I tested my application using screen reading software, and found that...
-- **Design Achievement 2**: I followed best practices for accessibility, including providing alt attributes for images and using semantic HTML. There are no `<div>` or `<span>` elements in my document.
-- **Design Achievement 3**: We tested the application with n=X users, finding that...
+### Design Achievements
+- **Two Page Website**: This design achievement is great because it means there is no url redirects, everything is on a single page and is hidden or shown based on the desired content. The website is very extendable this way
+because there is one main content area that dynamically fits to the page for whatever content needs to be displayed.
+- **Graphing Mechanism**: As mentioned before, there was an attempt at graphing the data in live on the website. This functionaly is not perfect so it is commented out in user.ejs but it has notable creativity that displays
+a users information well.
+- **ejs views**: this was a cool design feature becasue it allows a coder to script directly on the viewing page. It makes the webpage much more coding friendly. 
+- **Fun pictures**: there are a bunch of fun pictures throughout the website that give the user a good visual while using the website.
+- **Static Nav Bar inspired by Bulma**: This homebar is a cool feature of my website giving it a classy look that can actually be viewed on mobile devices. 
