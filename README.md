@@ -5,8 +5,7 @@
 http://a3-mjadiletta.glitch.me 
 
 #### Goal
-This is an application designed for the WPI track and field team. My coach asked me to make an easy to use website to add data to track basic food groups. This application accomplishes that and allows users to add data on a 
-daily basis and be stored in a database. 
+This is an application designed for the WPI track and field team. My coach asked me to make an easy to use website for adding data so that he can track the basic food groups we are eating. This application accomplishes this goal and allows users to add data on a daily basis and have the info stored in a database. 
 
 #### Challenges
 I had quite a few challenges with this assignment. First, I had an incredibly difficult time implementing the express server. I could not figure out how to communicate between the front end and the back end for many hours. 
