@@ -7,10 +7,13 @@ function returnHome(){
   setUsernameAndPassword()
   document.getElementById("VIEW_DATA").innerHTML = '\
             <div class="section" style="background-color:white; border-radius:20px; padding:13px"><div class="subtitle is-4" style="color:#2f2f2f">\
-              <p>The purpose of this website is to allow WPI athletes to keep track of major food groups in their diet such as carbohydrates, proteins, vegetables, oils, and more. A user can input data into the database and retrieve it at any time.</p>\
-              <p>Select a button on the navigation panel to the left to view, edit, or upload data.</p> \
-              <p>To delete a user select "Sign Out" then select "Remove User" and submit the user to delete. </p> \
-              <p>The current model for this website only allows the user to log a single day of information. In the future, this will be expanded for multiple days, and the "score" field will be used as a comparison metric for comparing athletes dieting habits.</p>\
+              <p>The purpose of this website is to allow WPI athletes to keep track of major food groups in their diet such as carbohydrates, proteins, vegetables, oils, and more. \
+                A user can input data into the database and retrieve it at any time.</p>\
+              <p>To edit your profile, select the View Profile button and make necessary changes to your username, password and display name. Note that you can only choose a username that hasnt already been taken.</p>\
+              <p>Export this database by pressing the export data button in the navagation bar. This will download a JSON file of the database to your laptop for safe keeping. <p>\
+              <p>To log out, press the log out button in the upper right. </p>\
+              <p>Select a tab on the navigation panel under Data Tools to add, edit, or delete data. Check out the graphing tool for visualizing your diet habits under the View Data tab.</p> \
+              <p>To add or remove a user, in the footer, there are two links to either add or remove a user. </p> \
             </div></div>'
 }
 
