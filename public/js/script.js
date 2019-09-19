@@ -6,12 +6,312 @@ var fields = ["carbohydrates", "fruits", "vegetables", "protein", "oil"];
 function returnHome(){
   setUsernameAndPassword()
   document.getElementById("VIEW_DATA").innerHTML = '\
-            <div class="subtitle is-4" style="color:#2f2f2f">\
+            <div class="section" style="background-color:white; border-radius:20px; padding:13px"><div class="subtitle is-4" style="color:#2f2f2f">\
               <p>The purpose of this website is to allow WPI athletes to keep track of major food groups in their diet such as carbohydrates, proteins, vegetables, oils, and more. A user can input data into the database and retrieve it at any time.</p>\
               <p>Select a button on the navigation panel to the left to view, edit, or upload data.</p> \
               <p>To delete a user select "Sign Out" then select "Remove User" and submit the user to delete. </p> \
               <p>The current model for this website only allows the user to log a single day of information. In the future, this will be expanded for multiple days, and the "score" field will be used as a comparison metric for comparing athletes dieting habits.</p>\
-            </div>'
+            </div></div>'
+}
+
+function  deleteUsers(){
+  var checkboxes = document.getElementsByName("REMOVE_USER_CHECKBOXES");
+  var json_data = edit_data;
+  var index_splice = -1;
+  for (var i=0; i<checkboxes.length; i++) {
+    var index = 0;
+    if(checkboxes[i].checked){
+      for (var c in json_data){
+        for(var user in json_data[c]) {
+          console.log(json_data[c][user]["username"])
+          if(json_data[c][user]["username"] === checkboxes[i].id){
+            index_splice = index;
+          }
+          index += 1;
+        }
+      }
+    }
+    if (index_splice >= 0){
+      json_data["users"].splice(index_splice, 1)
+    }
+  }
+
+  var myRequest = new Request('/updateUser', {
+      method: 'POST', 
+      body: JSON.stringify({ username:USERNAME, password:PASSWORD, data:json_data}), 
+      headers: { 'Content-Type': 'application/json' }
+  });
+
+  fetch(myRequest).then(
+    function(response) {
+    response.text().then(function(info) {
+      document.getElementById("VIEW_DATA").innerHTML = "Successfully Deleted Selected Users";
+    });
+  });
+}
+
+function removeUser(){
+  setUsernameAndPassword()
+  
+  let myRequest = new Request('/getDatabase', { method:'GET'} );
+  fetch(myRequest).then(function(response) {
+    response.json().then(function(json_data) {
+      edit_data = json_data
+      var output = '<div class="section" style="background-color:white; border-radius:20px; padding:13px"><h1> Delete Users </h1>'
+      for (var c in json_data){
+        for(var user in json_data[c]) {
+          if(json_data[c][user]["username"] !== USERNAME){
+            output += '<div class="column" style="margin: 0px 0px 10px 0px"><input type="checkbox" id="' + json_data[c][user]["username"] + '" name="REMOVE_USER_CHECKBOXES"> Display Name: ' + json_data[c][user]["displayName"] +  ' &nbsp; &nbsp;Username: ' + json_data[c][user]["username"] +  '</div>' 
+          }
+        }
+      }
+      output += '<button class="button" style="margin:10px 20px" id="SUBMIT_EDITS" onclick="deleteUsers()">Delete Selected Users</button></div>'
+      document.getElementById("VIEW_DATA").innerHTML = output
+    });
+   });
+
+}
+
+
+function submitNewUser(){
+  setUsernameAndPassword()
+  
+  var new_username = document.getElementById("NEW_USERNAME").value
+  var new_password = document.getElementById("NEW_PASSWORD").value
+  var new_display_name = document.getElementById("NEW_DISPLAYNAME").value
+  
+  if(new_username === "" ){document.getElementById("NEW_USERNAME").placeholder = "INCLUDE USERNAME" }
+  if(new_password === "" ){
+    document.getElementById("NEW_PASSWORD").placeholder = "INCLUDE PASSWORD"
+  }
+  if(new_display_name === ""){
+    document.getElementById("NEW_DISPLAYNAME").placeholder = "INCLUDE DISPLAY NAME"
+  }
+  if(new_username === "" | new_password === "" | new_display_name === ""){
+    return addNewUser("retry")
+  }
+  
+  let json_data
+  var max_user = 0;
+  var user_exists = false;
+
+  let myRequest = new Request('/getDatabase', { method:'GET'} );
+  fetch(myRequest).then(function(response) {
+    response.json().then(function(data) {
+      json_data = data
+      for (var c in json_data){
+        for(var user in json_data[c]) {
+          max_user = user
+          for(var field in json_data[c][user]){
+            if(field === "username"){
+              if(json_data[c][user][field] === new_username){
+                user_exists = true;
+              }
+            }
+          }
+        }
+      }
+      max_user = parseInt(max_user, 10) + 2;
+      if (user_exists === false){
+        
+        var new_user = {"id":max_user, "username": new_username, "password": new_password, "displayName": new_display_name, "data": {}}
+        json_data['users'].push(new_user)
+        
+        var newRequest = new Request('/updateUser', {
+          method: 'POST', 
+          body: JSON.stringify({ username:USERNAME, password:PASSWORD, data:json_data}), 
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        fetch(newRequest).then(
+          function(response) {
+          response.text().then(function(info) {
+            document.getElementById("VIEW_DATA").innerHTML = "Profile has been Added"  
+            });
+          });
+      }
+      else{
+        document.getElementById("VIEW_DATA").innerHTML = "Username already exists"  
+      }
+    });
+  });
+}
+
+function addNewUser(text){
+  setUsernameAndPassword()
+  let myRequest = new Request('/getDatabase', { method:'GET'} );
+  fetch(myRequest).then(function(response) {
+    response.json().then(function(json_data) {
+      var output = '<div class="section" style="background-color:white; border-radius:20px; padding:13px"><h1>User Profile</h1>'
+      for (var c in json_data){
+        for(var user in json_data[c]) {
+          for(var field in json_data[c][user]){
+            if(field === "username"){
+              if(json_data[c][user][field] === USERNAME){
+                output += '<div class=columns>'
+                output += '<div class="column has-text-right is-one-quarter">Username: </div><div class="column"><input class="input is-medium" type="text" id="NEW_USERNAME" placeholder="Add username" style="width:80%"></div><div class=column></div><br>'
+                output += '</div>'
+                output += '<div class=columns>'
+                output += '<div class="column has-text-right is-one-quarter">Password: </div><div class="column"><input class="input is-medium" type="text" id="NEW_PASSWORD" placeholder="Add password" style="width:80%"></div><div class=column></div><br>'
+                output += '</div>'
+                output += '<div class=columns>'
+                output += '<div class="column has-text-right is-one-quarter">Display Name: </div><div class="column"><input class="input is-medium" type="text" id="NEW_DISPLAYNAME" placeholder="Add display name" style="width:80%"></div><div class=column></div><br>'
+                output += '</div>'
+                output += '<button class="button" style="margin:10px 20px" onclick="submitNewUser()">Submit New User</button>'
+              }
+            }
+          }
+        }
+      }
+      if(text !== "retry"){
+        document.getElementById("VIEW_DATA").innerHTML = output
+      }
+    });
+   });
+}
+
+function submitProfile(){
+  setUsernameAndPassword()
+  
+  var new_username = document.getElementById("NEW_USERNAME").value
+  var new_password = document.getElementById("NEW_PASSWORD").value
+  var new_display_name = document.getElementById("NEW_DISPLAYNAME").value
+  
+  if(new_username === "" ){document.getElementById("NEW_USERNAME").placeholder = "INCLUDE USERNAME" }
+  if(new_password === "" ){
+    document.getElementById("NEW_PASSWORD").placeholder = "INCLUDE PASSWORD"
+  }
+  if(new_display_name === ""){
+    document.getElementById("NEW_DISPLAYNAME").placeholder = "INCLUDE DISPLAY NAME"
+  }
+  if(new_username === "" | new_password === "" | new_display_name === ""){
+    return editProfile("retry")
+  }
+  
+  let json_data
+  let myRequest = new Request('/getDatabase', { method:'GET'} );
+  fetch(myRequest).then(function(response) {
+    response.json().then(function(data) {
+      json_data = data
+      
+      var user_exists = false;
+      for (var c in json_data){
+        for(var user in json_data[c]) {
+          for(var field in json_data[c][user]){
+            if(field === "username"){
+              if(json_data[c][user][field] === new_username && new_username !== USERNAME){
+                user_exists = true;
+              }
+            }
+          }
+        }
+      }
+      if(user_exists === false){
+        for (var c in json_data){
+          for(var user in json_data[c]) {
+            for(var field in json_data[c][user]){
+              if(field === "username"){
+                if(json_data[c][user][field] === USERNAME){
+                  json_data[c][user]['username'] = new_username
+                  json_data[c][user]['password']  = new_password
+                  json_data[c][user]['displayName'] = new_display_name           
+
+                    var newRequest = new Request('/updateUser', {
+                      method: 'POST', 
+                      body: JSON.stringify({ username:USERNAME, password:PASSWORD, data:json_data}), 
+                      headers: { 'Content-Type': 'application/json' }
+                    });
+
+                    fetch(newRequest).then(
+                      function(response) {
+                      response.text().then(function(info) {
+                        document.getElementById("VIEW_DATA").innerHTML = "Profile has been Changed"  
+
+                        USERNAME = new_username
+                        document.getElementById("VIEW_DATA").value = new_username
+                        document.getElementById("WELCOME_NAME").innerHTML = "Welcome: " + new_display_name
+
+                        PASSWORD = new_password
+                        document.getElementById("VIEW_DATA").name = new_password
+                      });
+                    });
+                }
+              }
+            }
+          }
+        }
+      }
+      else{
+        document.getElementById("VIEW_DATA").innerHTML = "Username already exists" 
+      }
+    });
+   });
+    
+}
+
+function editProfile(text){
+  setUsernameAndPassword()
+  let myRequest = new Request('/getDatabase', { method:'GET'} );
+  fetch(myRequest).then(function(response) {
+    response.json().then(function(json_data) {
+      var output = '<div class="section" style="background-color:white; border-radius:20px; padding:13px"><h1>User Profile</h1>'
+      for (var c in json_data){
+        for(var user in json_data[c]) {
+          for(var field in json_data[c][user]){
+            if(field === "username"){
+              if(json_data[c][user][field] === USERNAME){
+                output += '<div class=columns>'
+                output += '<div class="column has-text-right is-one-quarter">Username: </div><div class="column"><input class="input is-medium" type="text" id="NEW_USERNAME" placeholder='+ json_data[c][user]['username'] +' style="width:80%"></div><div class=column></div><br>'
+                output += '</div>'
+                output += '<div class=columns>'
+                output += '<div class="column has-text-right is-one-quarter">Password: </div><div class="column"><input class="input is-medium" type="text" id="NEW_PASSWORD" placeholder='+ json_data[c][user]['password'] +' style="width:80%"></div><div class=column></div><br>'
+                output += '</div>'
+                output += '<div class=columns>'
+                output += '<div class="column has-text-right is-one-quarter">Display Name: </div><div class="column"><input class="input is-medium" type="text" id="NEW_DISPLAYNAME" placeholder='+ json_data[c][user]['displayName'] +' style="width:80%"></div><div class=column></div><br>'
+                output += '</div>'
+                output += '<button class="button" style="margin:10px 20px" onclick="submitProfile()">Submit Profile</button>'
+              }
+            }
+          }
+        }
+      }
+      if(text !== "retry"){
+        document.getElementById("VIEW_DATA").innerHTML = output
+      }
+    });
+   });
+}
+
+
+function viewProfile(){
+  setUsernameAndPassword()
+  let myRequest = new Request('/getDatabase', { method:'GET'} );
+  fetch(myRequest).then(function(response) {
+    response.json().then(function(json_data) {
+      var output = '<div class="section" style="background-color:white; border-radius:20px; padding:13px"><h1>User Profile</h1>'
+      for (var c in json_data){
+        for(var user in json_data[c]) {
+          for(var field in json_data[c][user]){
+            if(field === "username"){
+              if(json_data[c][user][field] === USERNAME){
+                output += '<div class=columns>'
+                output += '<div class="column has-text-right is-one-quarter">Username: </div><div class="column has-text-left is-one-fifth">'+ json_data[c][user]['username'] + '</div><div class=column></div>'
+                output += '</div>'
+                output += '<div class=columns>'
+                output += '<div class="column has-text-right is-one-quarter">Password: </div><div class="column has-text-left is-one-fifth">'+ json_data[c][user]['password'] + '</div><div class=column></div>'
+                output += '</div>'
+                output += '<div class=columns>'
+                output += '<div class="column has-text-right is-one-quarter">Display Name: </div><div class="column has-text-left is-one-fifth">'+ json_data[c][user]['displayName'] + '</div><div class=column></div>'
+                output += '</div>'
+                output += '<button class="button" style="margin:10px 20px" onclick="editProfile(\'none\')">Edit Profile</button>'
+                document.getElementById("VIEW_DATA").innerHTML = output
+              }
+            }
+          }
+        }
+      }
+    });
+   });
 }
 
 function addEntry(){
@@ -62,15 +362,15 @@ function setupAddData(){
   let myRequest = new Request('/getDatabase', { method:'GET'} );
   fetch(myRequest).then(function(response) {
     response.json().then(function(json_data) {
-      var output = '<h1> Add Entry </h1>'
-      output += '<input class="input is-large" type="text" id="NEW_DATE" placeholder="New Date (month/day)" style="margin: 10px 20px">'
+      var output = '<div class="section" style="background-color:white; border-radius:20px; padding:13px"><h1> Add Entry </h1>'
+      output += '<input class="input is-large" type="text" id="NEW_DATE" placeholder="New Date (month/day)" style="margin: 10px 20px; width:75%">'
       
       for(var i = 0; i < fields.length; i++){
         output += '<p class="subtitle is-5" style="padding: 5px 20px; margin: 0px 0px 0px 0px; color:black"><input type="checkbox" id="' + fields[i] + '" name="NEW_DATA_CHECKBOXES"> '+ fields[i] + '</p>';  
       }
       
       edit_data = json_data;
-      output += '<button class="button" style="margin:10px 20px" id="SUBMIT_EDITS" onclick="addEntry()">Submit New Entry</button>';
+      output += '<button class="button" style="margin:10px 20px" id="SUBMIT_EDITS" onclick="addEntry()">Submit New Entry</button></div>';
       document.getElementById("VIEW_DATA").innerHTML = output
     });
    });
@@ -128,7 +428,7 @@ function setupEditData(){
   let myRequest = new Request('/getDatabase', { method:'GET'} );
   fetch(myRequest).then(function(response) {
     response.json().then(function(json_data) {
-      var output = '<h1> Edit Entry </h1>'
+      var output = '<div class="section" style="background-color:white; border-radius:20px; padding:13px"><h1> Edit Entry </h1>'
       for (var c in json_data){
         for(var user in json_data[c]) {
           var thisUsername = false;
@@ -162,7 +462,7 @@ function setupEditData(){
         }
       }
       edit_data = json_data;
-      output += '<button class="button" style="margin:10px 20px" id="SUBMIT_EDITS" onclick="submitEdits()">Submit Edits</button>';
+      output += '<button class="button" style="margin:10px 20px" id="SUBMIT_EDITS" onclick="submitEdits()">Submit Edits</button></div>';
       document.getElementById("VIEW_DATA").innerHTML = output
     });
    });
@@ -208,7 +508,7 @@ function setupDeleteData(){
   let myRequest = new Request('/getDatabase', { method:'GET'} );
   fetch(myRequest).then(function(response) {
     response.json().then(function(json_data) {
-      var output = '<h1> Delete Entry </h1>'
+      var output = '<div class="section" style="background-color:white; border-radius:20px; padding:13px"><h1> Delete Entry </h1>'
       for (var c in json_data){
         for(var user in json_data[c]) {
           var thisUsername = false;
@@ -242,7 +542,7 @@ function setupDeleteData(){
         }
       }
       edit_data = json_data;
-      output += '<button class="button" style="margin:10px 20px" id="SUBMIT_EDITS" onclick="submitDeletes()">Submit Dates To Delete</button>';
+      output += '<button class="button" style="margin:10px 20px" id="SUBMIT_EDITS" onclick="submitDeletes()">Submit Dates To Delete</button></div>';
       document.getElementById("VIEW_DATA").innerHTML = output
     });
    });
@@ -253,7 +553,7 @@ function viewUserData(){
   let myRequest = new Request('/getDatabase', { method:'GET'} );
   fetch(myRequest).then(function(response) {
     response.json().then(function(json_data) {
-      var output = '<h1> User Info </h1>'
+      var output = '<div class="section" style="background-color:white; border-radius:20px; padding:13px"><h1> User Info </h1>'
       for (var c in json_data){
         for(var user in json_data[c]) {
           var thisUsername = false;
@@ -289,7 +589,7 @@ function viewUserData(){
           }
         }
       }
-      
+      output += "</div>"
       document.getElementById("VIEW_DATA").innerHTML = output
     });
    });
@@ -300,7 +600,7 @@ function viewAllData(){
   let myRequest = new Request('/getDatabase', { method:'GET'} );
   fetch(myRequest).then(function(response) {
     response.json().then(function(json_data) {
-      var output = '<h1> All User Info </h1>'
+      var output = '<div class="section" style="background-color:white; border-radius:20px; padding:13px"><h1> All User Info </h1>'
       for (var c in json_data){
         for(var user in json_data[c]) {
           output += '<h3 style="margin: 0px 0px 10px 0px">' + json_data[c][user]["displayName"] + '</h3>'
@@ -326,7 +626,7 @@ function viewAllData(){
           }
         }
       }
-      
+      output += "</div>"
       document.getElementById("VIEW_DATA").innerHTML = output
     });
    });
@@ -339,8 +639,12 @@ function loginUser(){
       body: JSON.stringify({ username:USERNAME, password:PASSWORD}), 
       headers: { 'Content-Type': 'application/json' }
   });
-  fetch(myRequest).then( res => res.json() ).then( 
-    window.location.pathname = '/'
+  fetch(myRequest).then( 
+    function(res){
+      return res.json() 
+    }).then( function(){ 
+      window.location.pathname = '/'
+    }
   );
 }
   
@@ -352,8 +656,4 @@ function setUsernameAndPasswordFromLogin(){
 function setUsernameAndPassword(){
   USERNAME = document.getElementById("VIEW_DATA").value;
   PASSWORD = document.getElementById("VIEW_DATA").name;
-}
-
-function viewUserGraph(){
-  
 }
