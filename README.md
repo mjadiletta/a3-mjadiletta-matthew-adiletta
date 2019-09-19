@@ -21,7 +21,7 @@ I chose to use my own database system. I wrote part of the database for the last
 easily and efficiently. It was also the easiest to implement because I coded it.
 
 #### CSS framework
-I chose to use BULMA because it provides many cool features with flex and templates. I liked bulma over other options because the formating is very clean - frendly for everyday users. It is also an easy import for html design. 
+I chose to use BULMA because it provides many cool features with flex and templates. I liked bulma over other options because the formating is very clean - frendly for everyday users. It is also an easy import for html design. Note: Bulma only works with: Chrome, Firefox, Opera, Safari (not Edge or Internet Explorer)
 
 #### Express Packages
 1. passport : passport is used for user authentication and was required for the project. 
